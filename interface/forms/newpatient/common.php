@@ -250,7 +250,7 @@ if ($fres) {
      </tr>
 	<?php if($GLOBALS['set_pos_code_encounter']){ ?>
         <tr>
-            <td><span class='bold' nowrap><?php xl('POS Code','e'); ?>: </span></td>
+            <td><span class='bold' nowrap><?php xlt('POS Code'); ?>: </span></td>
             <td colspan="6">
                 <select name="pos_code">
                 <?php
