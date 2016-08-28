@@ -131,6 +131,11 @@ $(document).ready(function(){
                         <td style="border-style:none;">
                             <a id="multiprintToFax" href="{$CONTROLLER}prescription&multiprintfax&id={$printm}" onclick="top.restoreSession()" class="css_button"><span>{xl t='Download'} ({xl t='Fax'})</span></a>
                         </td>
+                        {php} if ($GLOBALS['weno_rx_enable']) { {/php}
+						<td style="border-style:none;">
+                            <a id="multiprintToFax" href="{$WEBROOT}/interface/weno/transmit.php" onclick="top.restoreSession()" class="css_button"><span>{xl t='Transmit'} {xl t='Rx'}</span></a>
+                        </td>
+				        {php} } {/php}						
                         {if $CAMOS_FORM == true}
                         <td>
                             <a id="four_panel_rx" href="{$WEBROOT}/interface/forms/CAMOS/rx_print.php?sigline=plain" onclick="top.restoreSession()" class="css_button"><span>{xl t='View Four Panel'}</span></a>
@@ -166,6 +171,11 @@ $(document).ready(function(){
         <th>{xl t='Qty'}.</th>
         <th>{xl t='Unit'}</th>
         <th>{xl t='Provider'}</th>
+{php} if ($GLOBALS['weno_rx_enable']) { {/php}		
+		<th>{xl t='Send'}<br>{xl t='NewRx'}</th>
+		<th>{xl t='Refill'}<br>{xl t='Rx'}</th>
+		<th>{xl t='Last'}<br>{xl t='Tx Date'}</th>
+{php} } {/php}		
     </tr>
 
 	{foreach from=$prescriptions item=prescription} 
@@ -217,6 +227,21 @@ $(document).ready(function(){
     <td id="{$prescription->id}">
       {$prescription->provider->get_name_display()}&nbsp;
     </td>
+{php} if ($GLOBALS['weno_rx_enable']) { {/php}	
+	 <td align="center"> 
+	 {if $prescription->ntx==0}
+      <input class="check_list" id="NewRx-{$smarty.foreach.rx.index}" type="checkbox" value="{$prescription->id}" onClick="markTx('NewRx-{$prescription->id}');" title="Select to transmit">
+     {/if}
+     </td>
+	 <td align="center"> 
+     {if $prescription->ntx==1}
+      <input class="check_list" id="RefillRx-{$smarty.foreach.rx.index}" type="checkbox" value="{$prescription->id}" onClick="markTx('RefillRx-{$prescription->id}');" title="Select to transmit">
+	 {/if} 
+     </td>
+	 <td align="center"> 
+      Date here
+     </td>	
+{php} } {/php}	
   </tr>
 	{/foreach}
 </table>
