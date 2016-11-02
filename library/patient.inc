@@ -115,6 +115,7 @@ function getInsuranceProvidersExtra() {
           "addresses.zip, addresses.line1, addresses.state " .
           "from insurance_companies, addresses " .
           "where addresses.foreign_id = insurance_companies.id " .
+		  "and insurance_companies.inactive != 1 "  .
           "order by insurance_companies.name, addresses.zip";
 
         $rez = sqlStatement($sql);

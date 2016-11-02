@@ -2137,3 +2137,7 @@ CREATE TABLE `product_registration` (
 #IfNotRow2D list_options list_id Eye_Defaults_for_GENERAL option_id LADNEXA
 INSERT INTO `list_options` (`list_id`, `option_id`, `title`, `seq`, `is_default`, `option_value`, `mapping`, `notes`, `codes`, `toggle_setting_1`, `toggle_setting_2`, `activity`, `subtype`) VALUES ('Eye_Defaults_for_GENERAL', 'LADNEXA', 'normal lacrimal gland and orbit', 91, 0, 0, '', 'EXT', '', 0, 0, 0, '');
 #EndIf
+
+#IfMissingColumn insurance_companies suffix
+ALTER TABLE `insurance_companies` ADD `inactive` INT(1) NOT NULL DEFAULT '0' ;
+#EndIf
