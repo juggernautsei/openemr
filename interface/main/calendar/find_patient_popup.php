@@ -26,10 +26,12 @@ include_once("$srcdir/patient.inc");
 include_once("$srcdir/formdata.inc.php");
 
 $info_msg = "";
+$searchby = "";
+$searchparm = "";
 
  // If we are searching, search.
  //
-if ($_REQUEST['searchby'] && $_REQUEST['searchparm']) {
+if (isset($_REQUEST['searchby']) && $_REQUEST['searchparm']) {
   $searchby = $_REQUEST['searchby'];
   $searchparm = trim($_REQUEST['searchparm']);
 
@@ -175,7 +177,7 @@ echo '
     <option value="DOB"<?php if ($searchby == 'DOB') echo ' selected' ?>><?php echo htmlspecialchars( xl('DOB'), ENT_NOQUOTES); ?></option>
    </select>
  <?php echo htmlspecialchars( xl('for:'), ENT_NOQUOTES); ?>
-   <input type='text' id='searchparm' name='searchparm' size='12' value='<?php echo htmlspecialchars( $_REQUEST['searchparm'], ENT_QUOTES); ?>'
+   <input type='text' id='searchparm' name='searchparm' size='12' value='<?php echo htmlspecialchars( isset($_REQUEST['searchparm']), ENT_QUOTES); ?>'
     title='<?php echo htmlspecialchars( xl('If name, any part of lastname or lastname,firstname'), ENT_QUOTES); ?>'>
    &nbsp;
    <input type='submit' id="submitbtn" value='<?php echo htmlspecialchars( xl('Search'), ENT_QUOTES); ?>'>

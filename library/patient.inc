@@ -491,7 +491,7 @@ function getPatientLnames($term = "%", $given = "pid, id, lname, fname, mname, p
         // Do not search first name or middle name
         $where = "lname LIKE ? ";
         array_push($sqlBindArray, $names['last']);
-    } elseif($names['first'] == '' && $names['last'] != '') {
+    } elseif(isset($names['first']) == '' && $names['last'] != '') {
         // Search both first name and last name with same term
         $names['first'] = $names['last']; 
         $where = "lname LIKE ? OR fname LIKE ? ";

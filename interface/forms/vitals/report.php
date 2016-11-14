@@ -56,7 +56,7 @@ function vitals_report( $pid, $encounter, $cols, $id, $print = true) {
       }
       elseif ($key == "Bps") {
         $bps = $value;
-        if ($bpd) {
+        if (isset($bpd)) {
           $vitals .= "<td><span class=bold>" . xl('Blood Pressure') . ": </span><span class=text>" . $bps . "/". $bpd  . "</span></td>";
         }
         else {
