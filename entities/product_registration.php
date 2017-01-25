@@ -42,19 +42,19 @@ use Doctrine\ORM\Mapping\Id;
 		}
 
 		/**
-		 * @Column(name="p_registration_id"), type="char", length=36 nullable=false, options={"default" : 0})
+		 * @Column(name="registration_id"), type="char", length=36 nullable=false, options={"default" : 0})
 		 */
-		 private $registration_id;
+		 private $registrationId;
 
 		/**
-		 * @Column(name="p_email"), type="varchar", length=255 nullable=false, options={"default" : 0})
+		 * @Column(name="email"), type="varchar", length=255 nullable=false, options={"default" : 0})
 		 */
 		 private $email;
 
 		/**
-		 * @Column(name="p_opt_out"), type="tinyint", length=1 nullable=false, options={"default" : 0})
+		 * @Column(name="opt_out"), type="tinyint", length=1 nullable=false, options={"default" : 0})
 		 */
-	     private $opt_out;
+	     private $optOut;
 
 	    /**
 	     * Getter for registration_id.
@@ -62,7 +62,7 @@ use Doctrine\ORM\Mapping\Id;
 	     * return registration_id number
 	     */
 	    public function getRegistrationid() {
-	        return $this->registration_id;
+	        return $this->registrationId;
 	    }
 
 	    /**
@@ -71,7 +71,7 @@ use Doctrine\ORM\Mapping\Id;
 	     * @param registration_id string
 	     */
 	    public function setRegistrationid($value) {
-	        $this->registration_id = $value;
+	        $this->registrationId = $value;
 	    }     
 
 	    /**
@@ -98,7 +98,7 @@ use Doctrine\ORM\Mapping\Id;
 	     * return opt_out string
 	     */
 	    public function getOptout() {
-	        return $this->opt_out;
+	        return $this->optOut;
 	    }
 
 	    /**
@@ -107,7 +107,7 @@ use Doctrine\ORM\Mapping\Id;
 	     * @param opt_out number
 	     */
 	    public function setOptout($value) {
-	        $this->opt_out = $value;
+	        $this->optOut = $value;
 	    }
 
 	    /**
@@ -116,9 +116,9 @@ use Doctrine\ORM\Mapping\Id;
 	     * @return object as string
 	     */
 	    public function __toString() {
-	        return "registration_id: '" . $this->getRegistrationid() . "' " .
+	        return "registrationId: '" . $this->getRegistrationid() . "' " .
 	               "email: '" . $this->getEmail() . "' " .
-	               "opt_out" . $this->getOptout() . "' " ;
+	               "optOut" . $this->getOptout() . "' " ;
 	    }
 	}
 
