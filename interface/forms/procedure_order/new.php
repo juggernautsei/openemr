@@ -214,7 +214,6 @@ $enrow = sqlQuery("SELECT p.fname, p.mname, p.lname, fe.date FROM " .
 <head>
 <?php html_header_show(); ?>
 
-<script src="<?php echo $GLOBALS['assets_static_relative'] ?>/bootstrap-3-3-4/dist/js/bootstrap.min.js"></script>
 
 
 <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css" />
@@ -247,7 +246,7 @@ td {
 <script type="text/javascript" src="../../../library/dialog.js?v=<?php echo $v_js_includes; ?>"></script>
 <script type="text/javascript" src="<?php echo $GLOBALS['webroot'] ?>/library/textformat.js?v=<?php echo $v_js_includes; ?>"></script>
 <script type="text/javascript" src="<?php echo $GLOBALS['assets_static_relative']; ?>/jquery-datetimepicker-2-5-4/build/jquery.datetimepicker.full.min.js"></script>
-
+<script src="<?php echo $GLOBALS['assets_static_relative'] ?>/bootstrap-3-3-4/dist/js/bootstrap.min.js"></script>
 
 <?php if($_SESSION['language_direction'] == 'rtl'): ?>
 <link rel="stylesheet" href="<?php echo $GLOBALS['assets_static_relative'];?>/bootstrap-rtl-3-3-4/dist/css/bootstrap-rtl.min.css" type="text/css">
@@ -324,18 +323,18 @@ function addProcLine() {
  var cell = row.insertCell(0);
  cell.vAlign = 'top';
  //cell.innerHTML = "<b><?php echo xl('Procedure'); ?> " + (i + 1) + ":</b>";
- cell.innerHTML = "<b>"+prc_name+"<input type='hidden' name='form_proc_order_title[" + i + "]' value='"+ prc_name +"'></b>";
+ cell.innerHTML = "<b>"+prc_name+"<input class='form-control' type='hidden' name='form_proc_order_title[" + i + "]' value='"+ prc_name +"'></b>";
  var cell = row.insertCell(1);
  cell.vAlign = 'top';
  cell.innerHTML =
-  "<input type='text' size='50' name='form_proc_type_desc[" + i + "]'" +
+  "<input class='form-control' type='text' size='50' name='form_proc_type_desc[" + i + "]'" +
   " onclick='sel_proc_type(" + i + ")'" +
   " onfocus='this.blur()'" +
   " title='<?php echo xla('Click to select the desired procedure'); ?>'" +
   "  style='width:100%;cursor:pointer;cursor:hand' readonly />" +
-  " <input type='hidden' name='form_proc_type[" + i + "]' value='-1' />" +
+  " <input class='form-control' type='hidden' name='form_proc_type[" + i + "]' value='-1' />" +
   "<br /><?php echo xla('Diagnosis Codes'); ?>: " +
-  "<input type='text' size='50' name='form_proc_type_diag[" + i + "]'" +
+  "<input class='form-control' type='text' size='50' name='form_proc_type_diag[" + i + "]'" +
   " onclick='sel_related(this.name)'" +
   " title='<?php echo xla('Click to add a diagnosis'); ?>'" +
   " onfocus='this.blur()'" +
