@@ -606,16 +606,13 @@ if ($qoe_init_javascript)
 ?>
 
 </table>
-<div style="text-align: left">
-<div style="display:inline-block">
+<p>
 <?php $procedure_order_type = getListOptions('order_type' , array('option_id', 'title')); ?>
 <select name="procedure_type_names" id="procedure_type_names" class='form-control'>
 	<?php foreach($procedure_order_type as $ordered_types){?>
 	<option value="<?php echo attr($ordered_types['option_id']); ?>" ><?php echo text(xl_list_label($ordered_types['title'])) ; ?></option>
 	<?php } ?>
 </select>
-</div>
-<div style="display:inline-block">
 <input type='button' value='<?php echo xla('Add Procedure'); ?>' onclick="addProcLine()" />
 &nbsp;
 <input type='submit' name='bn_save' value='<?php echo xla('Save'); ?>' onclick='transmitting = false;' />
@@ -623,12 +620,7 @@ if ($qoe_init_javascript)
 <input type='submit' name='bn_xmit' value='<?php echo xla('Save and Transmit'); ?>' onclick='transmitting = true;' />
 &nbsp;
 <input type='button' value='<?php echo xla('Cancel'); ?>' onclick="top.restoreSession();location='<?php echo $GLOBALS['form_exit_url']; ?>'" />
-</div>
-</div>
 </p>
-
-
-
 
 </form>
 </div><!--end of div wrapper -->
