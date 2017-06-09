@@ -3213,6 +3213,7 @@ INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES (
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','OK','Oklahoma'            ,37,0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','OR','Oregon'              ,38,0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','PA','Pennsylvania'        ,39,0);
+INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','PR','Puerto Rico'         ,39,0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','RI','Rhode Island'        ,40,0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','SC','South Carolina'      ,41,0);
 INSERT INTO list_options ( list_id, option_id, title, seq, is_default ) VALUES ('state','SD','South Dakota'        ,42,0);
@@ -5385,7 +5386,7 @@ CREATE TABLE `pharmacies` (
   `transmit_method` int(11) NOT NULL default '1',
   `email` varchar(255) default NULL,
   `ncpdp` int(12) DEFAULT NULL,
-  `npi` int(12) DEFAULT NULL.
+  `npi` int(12) DEFAULT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB;
 
@@ -9677,6 +9678,47 @@ CREATE TABLE `codes_history` (
   `update_by` varchar(255),
    PRIMARY KEY (`log_id`)
 ) ENGINE=InnoDB;
+
+-- Table of drugs that can be ordered
+DROP TABLE IF EXISTS `erx_drug_paid`;
+CREATE TABLE IF NOT EXISTS `erx_drug_paid` (
+  `drugid` int(11) NOT NULL AUTO_INCREMENT,
+  `drug_label_name` varchar(45) NOT NULL,
+  `ahfs_descr` varchar(45) NOT NULL,
+  `ndc` bigint(12) NOT NULL,
+  `price_per_unit` decimal(5,2) NOT NULL,
+  `avg_price` decimal(6,2) NOT NULL,
+  `avg_price_paid` int(6) NOT NULL,
+  `avg_savings` decimal(6,2) NOT NULL,
+  `avg_percent` decimal(6,2) NOT NULL,
+   PRIMARY KEY (`drugid`)
+   ) ENGINE=InnoDB  
+
+-- Table to save prescriptions ordered log
+DROP TABLE IF EXISTS `erx_rx_log`;
+CREATE TABLE IF NOT EXISTS `erx_rx_log` (
+   `id` int(20) NOT NULL AUTO_INCREMENT,
+   `prescription_id` int(6) NOT NULL,
+   `date` varchar(25) NOT NULL,
+   `time` varchar(15) NOT NULL,
+   `code` int(6) NOT NULL,
+   `status` text NOT NULL,
+   `message_id` varchar(100) DEFAULT NULL,
+   `read` int(1) DEFAULT NULL,
+   PRIMARY KEY (`id`)
+    ) ENGINE=InnoDB  
+
+-- Table list of narcotics that should not be ordered
+DROP TABLE IF EXISTS `erx_narcotics`;
+CREATE TABLE IF NOT EXISTS `erx_narcotics` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `drug` varchar(255) NOT NULL,
+  `dea_number` varchar(5) NOT NULL,
+  `csa_sch` varchar(2) NOT NULL,
+  `narc` varchar(2) NOT NULL,
+  `other_names` varchar(255) NOT NULL,
+   PRIMARY KEY (`id`)
+ ) ENGINE=InnoDB
 
 -- Table to store multiple db connection details
 DROP TABLE IF EXISTS `multiple_db`;

@@ -1,25 +1,13 @@
 <?php
-
-/** Copyright (C) 2016 Sherwin Gaddis <sherwingaddis@gmail.com>
- *
- * LICENSE: This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://opensource.org/licenses/gpl-license.php>;.
+/**
+ * weno rx formulary update.
  *
  * @package OpenEMR
- * @author  Sherwin Gaddis <sherwingaddis@gmail.com>
  * @link    http://www.open-emr.org
+ * @author  Sherwin Gaddis <sherwingaddis@gmail.com>
+ * @copyright Copyright (c) 2016-2017 Sherwin Gaddis <sherwingaddis@gmail.com>
+ * @license https://github.com/openemr/openemr/blob/master/LICENSE GNU General Public License 3
  */
-$fake_register_globals=false;
-
-$sanitize_all_escapes=true;	
 
  require_once("../globals.php");
  
@@ -66,7 +54,7 @@ $zip->close();
 
  $file = "./Weno Exchange LLC/BSureFormulary.txt";
  $lines = count(file($file));
- echo $lines. "<br>";
+ echo text($lines). "<br>";
  
  
  $i = 2;
@@ -89,7 +77,7 @@ $zip->close();
  
  //if(!empty($find['ndc'])){
 	 sqlStatement("INSERT INTO `erx_drug_paid` SET `drug_label_name` = ?, `NDC` = ?, `price_per_unit` = ? ", array($drugName,$ndc,$price));
-	 echo text("Inserted "). $drugName ."<br> "; 	
+	 echo text("Inserted")."". text($drugName) ."<br> "; 	
 	 //sqlStatement("UPDATE erx_drug_paid SET price_per_unit = ? WHERE ndc = ?", array($price, $ndc));
 	 //echo "Updated!<br>";
 // }else{
