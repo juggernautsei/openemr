@@ -201,6 +201,7 @@ function ReturnOFXSql()
 
 function get_Default_X12($pid)
 {
+    //This function needs to go away if we are patching the system.
     $sql = "SELECT a.x12_default_partner_id FROM insurance_companies AS a JOIN insurance_data AS b ON a.id = b.provider WHERE b.pid = ? AND type = ?";
     $result = sqlQuery($sql,array($pid,'primary'));
 
