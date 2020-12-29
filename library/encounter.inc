@@ -58,3 +58,19 @@ function fetchDateService($encounter)
     $result = explode(" ", $result['date']);
     return $result[0];
 }
+
+/**
+ * @return bool
+ */
+function checkFeeSheet()
+{
+    $encounter = $_SESSION['encounter'];
+    $sql = "SELECT code FROM billing WHERE encounter = ?";
+    $status = sqlQuery($sql, [$encounter]);
+
+    if (!empty($status)) {
+        return true;
+    } else {
+        return false;
+    }
+}

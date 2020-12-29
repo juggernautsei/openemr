@@ -91,6 +91,15 @@ function closeTab(winname, refresh) {
   }
 }
 
+/*
+ * After the last tab is opened, the system should go back to the summary tab
+ */
+$(window).on('load', function() {
+    setTimeout(function() {
+        $("#enctabs").tabs('option', 'active', 0);
+    }, 2000);
+});
+
 </script>
 </head>
 <body class='m-0'>

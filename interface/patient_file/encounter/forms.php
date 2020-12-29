@@ -404,6 +404,54 @@ function toggleFrame1(fnum) {
   top.frames['left_nav'].document.forms[0].cb_top.checked=false;
   top.window.parent.left_nav.toggleFrame(fnum);
 }
+//Added by Sherwin 2019-12-06 open multiple forms in the encounter
+window.onload = function(){
+    var pid = <?php echo $pid; ?>;
+    var tab_url = "\<?php echo $GLOBALS['webroot']; ?>";
+    var formLoader = "\/interface\/patient_file\/encounter\/load_form.php?formname=";
+    var destination = '';
+
+    <?php
+    $isSigned = $esignApi->createEncounterESign($encounter);
+    $doc = docsAdded();  //if the form has been filled out don't load the tab
+    $referringpage = explode("/", $_SERVER['HTTP_REFERER']); //don't reload tabs if the referring page is these pages
+    $page_forms = array_search("forms.php", $referringpage);
+    $page_save = array_search("save.php", $referringpage);
+    $page_delete = array_search("delete_form.php", $referringpage);
+    $page_view_form = array_search("view_form.php", $referringpage);
+
+    //This started life as a way to not load forms for a particular visit type. Now it is also used to
+    // load forms for a particular visit type.
+
+    $sql = "SELECT tm.form_list FROM tabs_manager tm " .
+        "JOIN form_encounter fe ON tm.category = fe.pc_catid ".
+        "WHERE fe.encounter = ?";
+
+    $formslist = sqlQuery($sql, [$encounter]);
+    $destinationtitlearray = json_decode($formslist['form_list']);
+
+    if (!$isSigned->isLocked()) {
+    if (empty($page_forms) && empty($page_save) && empty($page_delete)) {
+    foreach ($destinationtitlearray as $key => $value) {
+        if (!in_array($key, $doc)) {
+            echo ' destination = "' . $key . '"; ';
+            echo ' openNewForm(tab_url+formLoader+destination, "' . $value . '"); ';
+        }
+    }
+    ?>
+    <?php if (checkFeeSheet() == false) { ?>
+    let tab_url_s = "\<?php echo $GLOBALS['webroot']; ?>\/controller.php?prescription&list&id=";
+    openNewForm(tab_url_s+pid, "Medications/Prescriptions");
+    destination =  "fee_sheet";
+    openNewForm(tab_url+formLoader+destination, "Fee Sheet");
+    <?php }
+
+    }
+    }
+    /*}*/
+    ?>
+}
+
 </script>
 <script>
 
