@@ -14,6 +14,8 @@
 require_once("../globals.php");
 require_once("$srcdir/patient.inc");
 
+use OpenEMR\Common\Logging\EventAuditLogger;
+use OpenEMR\Immunization\TransmitImmunization;
 use OpenEMR\Common\Csrf\CsrfUtils;
 use OpenEMR\Core\Header;
 
@@ -255,6 +257,7 @@ if (!empty($_POST['form_get_hl7']) && ($_POST['form_get_hl7'] === 'true')) {
             "$D";
     }
 
+    if ($GLOBALS['transmit_immun']) {
     // send the header here
     header('Content-type: text/plain');
     header('Content-Disposition: attachment; filename=' . $filename);
@@ -262,6 +265,25 @@ if (!empty($_POST['form_get_hl7']) && ($_POST['form_get_hl7'] === 'true')) {
     // put the content in the file
     echo($content);
     exit;
+    } else {
+        $filename = "IMM~".$_SESSION['authUserID']."-".rand(99, 9972)."GMU-".date("mdY").".hl7";
+        file_put_contents(realpath(__DIR__. '/../..').'/src/Immunization/'.$filename, $content);
+        $send = new TransmitImmunization();
+        $response = $send->sendContent($content, $filename);
+
+        if ($response == 'Success') {
+            unlink(realpath(__DIR__. '/../..').'/src/Immunization/'.$filename);
+            $logstring = date("Y-m-d H:m:i") ." : Immunizations Transmitted";
+            EventAuditLogger::instance()->newEvent("transmit-immu", $_SESSION['authUser'], $_SESSION['authProvider'], 1, "$logstring");
+            echo '<script language="javascript">';
+            echo 'alert("message successfully sent")';
+            echo '</script>';
+        } else {
+            echo '<script language="javascript">';
+            echo 'alert("Something is wrong - "+ .'. $response.')';
+            echo '</script>';
+        }
+    }
 }
 ?>
 <html>
