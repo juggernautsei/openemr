@@ -1902,6 +1902,14 @@ if ($track_is_registered) {
 </div><!-- end container div -->
 <?php $oemr_ui->oeBelowContainerDiv(); ?>
 <script>
+    document.getElementById('telehealth').addEventListener('click', telehealth);
+
+    function telehealth() {
+        //dlgopen('../../jitsi/jitsi.php?csrf_token_form=' + <?php //echo js_url(CsrfUtils::collectCsrfToken()) ?>, '_blank', 1250, 1100);
+        top.restoreSession();
+        window.open('../../jitsi/jitsi.php');
+        return false;
+    }
     // Array of skip conditions for the checkSkipConditions() function.
     var skipArray = [
         <?php echo ($condition_str ?? ''); ?>
