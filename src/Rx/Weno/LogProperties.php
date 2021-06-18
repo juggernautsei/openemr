@@ -68,14 +68,23 @@ class LogProperties
         $this->provider = $this->container->getTransmitproperties();
     }
 
+    private function providerCredentials()
+    {
+        //find the first Weno user password in the settings and get ID and password
+        $sql = "select ue.id, ue.email, us.setting_value from users ue JOIN user_settings us ON us.setting_user = ue.id where us.setting_label = 'global:weno_provider_password'";
+        $credentials = sqlQuery($sql);
+        return $credentials;
+    }
+
     /**
      * @return string
      */
     public function logEcps()
     {
-        $email = $this->provider->getProviderEmail();
-        $prov_pass =  $this->provider->getProviderPassword();                // gets the password stored for the
-        $md5 = md5($prov_pass);                       // hash the current password
+        $credentialInformation = $this->providerCredentials();                                                   // get the credentials to be used
+        $email = $credentialInformation['email'];                                                                // an array is returned
+        $prov_pass =  $this->cryptoGen->decryptStandard($credentialInformation['setting_value']);                // decrypt the password
+        $md5 = md5($prov_pass);                                                                                  // hash the password
         $workday = date("l");
         //This is to cover working on Saturday but not on Sunday.
         //Checking Saturday for any prescriptions that were written.
@@ -86,7 +95,7 @@ class LogProperties
         }
 
         $p = [
-            "UserEmail" => $email['email'],
+            "UserEmail" => $email,
             "MD5Password" => $md5,
             "FromDate" => $yesterday,
             "ToDate" => $yesterday,

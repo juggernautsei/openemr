@@ -105,19 +105,12 @@ class TransmitProperties
      */
     public function getFacilityInfo()
     {
-        $locid = sqlQuery("select name, street, city, state, postal_code, phone, fax, weno_id from facility where id = ?", [$_SESSION['facilityId']]);
+        $locid = sqlQuery("select name, street, city, state, postal_code, phone, fax, weno_id from facility where weno_id != ''");
 
         if (empty($locid['weno_id'])) {
-            //if not in an encounter then get the first facility location id as default
-            $default_facility = sqlQuery("select name, street, city, state, postal_code, phone, fax, weno_id from facility order by id asc limit 1");
-
-            if (empty($default_facility)) {
                 echo xlt('Facility ID is missing');
                 exit;
-            } else {
-                return $default_facility;
             }
-        }
         return $locid;
     }
 
@@ -126,12 +119,6 @@ class TransmitProperties
      */
     private function getPatientInfo()
     {
-        //get patient data if in an encounter
-        //Since the transmitproperties is called in the logproperties
-        //need to check to see if in an encounter or not. Patient data is not required to view the Weno log
-        if (empty($_SESSION['encounter'])) {
-            die("please select an encounter");
-        }
         $missing = 0;
         $patient = sqlQuery("select title, fname, lname, mname, street, state, city, email, phone_cell, postal_code, dob, sex, pid from patient_data where pid=?", [$_SESSION['pid']]);
         if (empty($patient['fname'])) {

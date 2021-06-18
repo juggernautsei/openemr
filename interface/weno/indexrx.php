@@ -24,8 +24,7 @@ $container = new Container();
 $wenoProperties = $container->getTransmitproperties();
 $provider_info = $wenoProperties->getProviderEmail();
 $urlParam = $wenoProperties->cipherpayload();          //lets encrypt the data
-$logsync = $container->getLogproperties();
-$logsync->logSync();
+
 $newRxUrl = "https://online.wenoexchange.com/en/NewRx/ComposeRx?useremail=";
 if ($urlParam == 'error') {   //check to make sure there were no errors
     echo xlt("Cipher failure check encryption key");
