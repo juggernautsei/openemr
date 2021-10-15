@@ -488,6 +488,13 @@ $partners = $x->_utility_array($x->x12_partner_factory());
                 }
             }
         }
+
+        function changeInsurance(pid) {
+            if (!window.focus) return true;
+            if (!ProcessBeforeSubmitting()) return false;
+            top.restoreSession();
+            dlgopen('change_primary.php?pid='+pid, '_blank', 750, 400);
+        }
     </script>
     <?php require_once "$srcdir/../interface/reports/report.script.php"; ?>
     <!-- Criteria Section common javascript page-->
@@ -942,7 +949,7 @@ $partners = $x->_utility_array($x->x12_partner_factory());
                             }
 
                             $this_encounter_id = $iter['enc_pid'] . "-" . $iter['enc_encounter'];
-
+                            $this_pid = $iter['enc_pid'];
                             if ($last_encounter_id != $this_encounter_id) {
                             // This dumps all HTML for the previous encounter.
                                 if ($lhtml) {
@@ -1092,6 +1099,7 @@ $partners = $x->_utility_array($x->x12_partner_factory());
                                 if ($iter['id']) {
                                     $lcount += 2;
                                     $lhtml .= "<br />\n";
+                                    $lhtml .= "<button class='btn btn-warning' onclick='changeInsurance($this_pid); return false;'>Change Primary Insurance</button>";
                                     $lhtml .= "&nbsp;<span class='form-group'>" . xlt('Bill') . ": ";
                                     $lhtml .= "<select name='claims[" . attr($this_encounter_id) . "][payer]' onchange='onNewPayer(event)' class='form-control'>";
 
