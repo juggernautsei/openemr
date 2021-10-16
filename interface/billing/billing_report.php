@@ -493,7 +493,7 @@ $partners = $x->_utility_array($x->x12_partner_factory());
             if (!window.focus) return true;
             if (!ProcessBeforeSubmitting()) return false;
             top.restoreSession();
-            dlgopen('change_primary.php?pid='+pid, '_blank', 750, 400);
+            dlgopen('change_primary_insurance.php?pid='+pid, '_blank', 750, 400);
         }
     </script>
     <?php require_once "$srcdir/../interface/reports/report.script.php"; ?>

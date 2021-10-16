@@ -57,3 +57,32 @@ foreach ($insurance_display as $display) {
 echo xlt("Primary ") . ": " . $primary . "<br>";
 echo xlt("Secondary ") . ": " . $secondary;
 
+?>
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Change Insurance Company Order</title>
+</head>
+<body>
+<div class="example-parent">
+    <div class="example-origin">
+        <div
+            id="draggable-1"
+            class="example-draggable"
+        >
+            draggable
+        </div>
+    </div>
+
+    <div
+        class="example-dropzone"
+    >
+        dropzone
+    </div>
+</div>
+</body>
+</html>
