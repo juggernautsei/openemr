@@ -16,9 +16,11 @@ use OpenEMR\Services\InsuranceService;
 use OpenEMR\Services\InsuranceCompanyService;
 
 $insurance_data = new InsuranceService();
-//make sure there is a pid sent in the call
+if (!empty($_POST)) {
+    var_dump($_POST);
+    die;
+}
 $pid = $_GET['pid'] ?? null;
-//properly initialize variables
 $primary = '';
 $secondary = '';
 $tertiary = '';
@@ -26,16 +28,12 @@ $primary_id = '';
 $secondary_id = '';
 $tertiary_id = '';
 
-//if no pid fail gracefully with usable error message.
 if ($pid) {
     $insurance_display = $insurance_data->getAll($pid);
 } else {
-    die("Error: patient PID is empty");
+    die("Error patient PID is empty");
 }
-//initialize count of insurance companies which at this time can be only 3
 $i = 1;
-
-//loop through the returned data. setting the variables
 foreach ($insurance_display as $display) {
     $show_provider = '';
     $provider_name = new InsuranceCompanyService();
@@ -50,10 +48,10 @@ foreach ($insurance_display as $display) {
         $tertiary = $show_provider['name'];
         $tertiary_id = $show_provider['id'];
     }
+
     ++$i;
 }
 
-//This is temporary until decide how this will be handled on this page to change the status
 echo xlt("Primary ") . ": " . $primary . "<br>";
 echo xlt("Secondary ") . ": " . $secondary;
 
@@ -66,23 +64,122 @@ echo xlt("Secondary ") . ": " . $secondary;
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Change Insurance Company Order</title>
+    <style>
+        .insurance-parent {
+            border: 2px solid #DFA612;
+            color: black;
+            display: flex;
+            font-family: sans-serif;
+            font-weight: bold;
+        }
+
+        .insurance-origin {
+            flex-basis: 100%;
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        .insurance-draggable {
+            background-color: #4AAE9B;
+            font-weight: normal;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        .insurance-dropzone {
+            background-color: #6DB65B;
+            flex-basis: 100%;
+            flex-grow: 1;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-<div class="example-parent">
-    <div class="example-origin">
-        <div
-            id="draggable-1"
-            class="example-draggable"
-        >
-            draggable
-        </div>
+<div class="insurance-parent">
+    <div class="insurance-origin">
+        <form id='draggable' method='post' action='change_primary_insurance.php'>
+            <div
+                id="insurance-1"
+                class="insurance-draggable"
+                draggable="true"
+                ondragstart="onDragStart(Event);">
+                <input type='hidden' value='5' id='insurance1'>
+                Insurance One
+            </div>
+            <div
+                id="insurance-2"
+                class="insurance-draggable"
+                draggable="true"
+                ondragstart="onDragStart(Event);">
+                <input type='hidden' value='15'  id='insurance2'>
+                Insurance Two
+            </div>
+            <div
+                id="insurance-3"
+                class="insurance-draggable"
+                draggable="true"
+                ondragstart="onDragStart(Event);">
+                <input type='hidden' value='115'  id='insurance3'>
+                Insurance Three
+            </div>
     </div>
-
     <div
-        class="example-dropzone"
+        class="insurance-dropzone"
+        ondragover="onDragOver(Event);"
+        ondrop="onDrop(Event);"
     >
         dropzone
     </div>
+    <input type='submit' value='Update'>
 </div>
+<div class='button'>
+
+    <script>
+
+        function onDragStart(event) {
+            event
+                .dataTransfer
+                .setData('text/plain', event.target.id);
+
+            event
+                .currentTarget
+                .style
+                .backgroundColor = 'yellow';
+        }
+
+        function onDragOver(event) {
+            event.preventDefault();
+
+        }
+
+        function onDrop(event) {
+            const id = event
+                .dataTransfer
+                .getData('text');
+            const draggableElement = document.getElementById(id);
+            const dropzone = event.target;
+            dropzone.appendChild(draggableElement);
+            event
+                .dataTransfer
+                .clearData();
+
+        }
+
+        function getInputs() {
+            const ele = document.getElementsByTagName('input');
+
+            for (i = 0; i < ele.length; i++) {
+                if (ele[i].type == 'hidden') {
+                    console.log('Value: ' + ele[i].value);
+                    for (j = 0; j < ele[i].attributes.length; j++) {
+                        console.log(ele[i].attributes[j]);
+                    }
+                }
+            }
+        }
+
+    </script>
+
 </body>
 </html>
