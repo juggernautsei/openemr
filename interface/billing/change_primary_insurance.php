@@ -14,6 +14,7 @@ require_once dirname(__FILE__, 2) . "/globals.php";
 
 use OpenEMR\Services\InsuranceService;
 use OpenEMR\Services\InsuranceCompanyService;
+use OpenEMR\Core\Header;
 
 $insurance_data = new InsuranceService();
 if (!empty($_POST)) {
@@ -63,6 +64,7 @@ echo xlt("Secondary ") . ": " . $secondary;
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <?php Header::setupHeader(); ?>
     <title>Change Insurance Company Order</title>
     <style>
         .insurance-parent {
@@ -103,7 +105,7 @@ echo xlt("Secondary ") . ": " . $secondary;
                 id="insurance-1"
                 class="insurance-draggable"
                 draggable="true"
-                ondragstart="onDragStart(Event);">
+                ondragstart="onDragStart(event);">
                 <input type='hidden' value='5' id='insurance1'>
                 Insurance One
             </div>
@@ -111,7 +113,7 @@ echo xlt("Secondary ") . ": " . $secondary;
                 id="insurance-2"
                 class="insurance-draggable"
                 draggable="true"
-                ondragstart="onDragStart(Event);">
+                ondragstart="onDragStart(event);">
                 <input type='hidden' value='15'  id='insurance2'>
                 Insurance Two
             </div>
@@ -119,16 +121,15 @@ echo xlt("Secondary ") . ": " . $secondary;
                 id="insurance-3"
                 class="insurance-draggable"
                 draggable="true"
-                ondragstart="onDragStart(Event);">
+                ondragstart="onDragStart(event);">
                 <input type='hidden' value='115'  id='insurance3'>
                 Insurance Three
             </div>
     </div>
     <div
         class="insurance-dropzone"
-        ondragover="onDragOver(Event);"
-        ondrop="onDrop(Event);"
-    >
+        ondragover="onDragOver(event);"
+        ondrop="onDrop(event);">
         dropzone
     </div>
     <input type='submit' value='Update'>
@@ -138,19 +139,12 @@ echo xlt("Secondary ") . ": " . $secondary;
     <script>
 
         function onDragStart(event) {
-            event
-                .dataTransfer
-                .setData('text/plain', event.target.id);
-
-            event
-                .currentTarget
-                .style
-                .backgroundColor = 'yellow';
+            event.dataTransfer.setData('text/plain', event.target.id);
+            event.currentTarget.style.backgroundColor = 'yellow';
         }
 
         function onDragOver(event) {
             event.preventDefault();
-
         }
 
         function onDrop(event) {
@@ -168,7 +162,6 @@ echo xlt("Secondary ") . ": " . $secondary;
 
         function getInputs() {
             const ele = document.getElementsByTagName('input');
-
             for (i = 0; i < ele.length; i++) {
                 if (ele[i].type == 'hidden') {
                     console.log('Value: ' + ele[i].value);
