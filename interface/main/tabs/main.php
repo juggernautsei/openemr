@@ -46,6 +46,10 @@ $session = SessionWrapperFactory::getInstance()->getActiveSession();
 
 $logoService = new LogoService();
 $menuLogo = $logoService->getLogo('core/menu/primary/');
+// Prefer site menu logo; fall back to login primary (product TAREVO logo).
+if ($menuLogo === '') {
+    $menuLogo = $logoService->getLogo('core/login/primary/');
+}
 $versionService = new VersionService();
 $softwareVersion = text((string) $versionService->getSoftwareVersion());
 // Registration status and options.
@@ -371,6 +375,8 @@ $twig = ServiceContainer::getTwig();
     <script src="js/frame_proxies.js?v=<?php echo OEGlobalsBag::getInstance()->getString('v_js_includes'); ?>"></script>
     <script src="js/dialog_utils.js?v=<?php echo OEGlobalsBag::getInstance()->getString('v_js_includes'); ?>"></script>
     <script src="js/shortcuts.js?v=<?php echo OEGlobalsBag::getInstance()->getString('v_js_includes'); ?>"></script>
+    <script src="js/main_shell_layout.js?v=<?php echo OEGlobalsBag::getInstance()->getString('v_js_includes'); ?>"></script>
+    <link rel="stylesheet" href="css/main_shell.css?v=<?php echo attr(OEGlobalsBag::getInstance()->getString('v_js_includes')); ?>-shell5" />
 
     <?php
     // Below code block is to prepare certain elements for deciding what links to show on the menu
@@ -442,9 +448,10 @@ $twig = ServiceContainer::getTwig();
             . ',' . json_encode($session->get('authProvider')); ?>));
     </script>
     <style>
-      html,
-      body {
-        width: max-content;
+      /* Vertical shell owns width/height; legacy max-content fought the left rail */
+      html.main-shell-html,
+      body.main-shell-body {
+        width: 100% !important;
         min-height: 100% !important;
         height: 100% !important;
       }
@@ -455,7 +462,8 @@ $twig = ServiceContainer::getTwig();
     </style>
 </head>
 
-<body class="min-vw-100">
+<body class="min-vw-100 main-shell-body">
+<script>document.documentElement.classList.add('main-shell-html');</script>
     <?php
     // fire off an event here
     $dispatcher = OEGlobalsBag::getInstance()->hasKernel()
@@ -482,52 +490,77 @@ $twig = ServiceContainer::getTwig();
         }
     }
     ?>
-    <div id="mainBox" <?php echo $disp_mainBox ?>>
-        <nav class="navbar navbar-expand-xl navbar-light bg-light py-0">
-            <?php if (OEGlobalsBag::getInstance()->getBoolean('display_main_menu_logo')) {
+    <div id="mainBox" class="main-shell main-shell--vertical" <?php echo $disp_mainBox ?>>
+        <aside id="mainSidebar" class="main-shell__sidebar" aria-label="<?php echo xla('Main navigation'); ?>">
+            <div class="main-shell__brand">
+                <button type="button" id="mainShellMenuToggle" class="btn btn-sm btn-link main-shell__menu-toggle d-md-none p-0" aria-controls="mainSidebar" aria-expanded="true" title="<?php echo xla('Toggle menu'); ?>">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                    <span class="sr-only"><?php echo xlt('Toggle menu'); ?></span>
+                </button>
+                <?php
+                // Always show site/product logo in the vertical shell header when available.
                 $bag = OEGlobalsBag::getInstance();
-                $logoLinkDefault = 'https://www.open-emr.org/';
-                $logoTitleDefault = xl('OpenEMR Website');
+                $logoLinkDefault = '';
+                $logoTitleDefault = $bag->getString('openemr_name', 'TAREVO');
                 $logoLink = trim($bag->getString('main_menu_logo_link', $logoLinkDefault));
                 $logoTitle = trim($bag->getString('main_menu_logo_title', $logoTitleDefault));
-                $logoImg = '<img src="' . attr($menuLogo) . '" class="d-inline-block align-middle" height="16" alt="' . xla('Main Menu Logo') . '">';
-                if ($logoLink !== '') {
-                    echo '<a class="navbar-brand" href="' . attr($logoLink) . '" title="' . attr($logoTitle) . '" rel="noopener" target="_blank">' . $logoImg . '</a>' . "\n";
+                if ($menuLogo !== '') {
+                    $logoImg = '<img src="' . attr($menuLogo) . '" class="main-shell__brand-logo" alt="' . attr($logoTitle) . '">';
+                    if ($logoLink !== '') {
+                        echo '<a class="main-shell__brand-link navbar-brand" href="' . attr($logoLink) . '" title="' . attr($logoTitle) . '" rel="noopener" target="_blank">' . $logoImg . '</a>' . "\n";
+                    } else {
+                        echo '<span class="main-shell__brand-link navbar-brand" title="' . attr($logoTitle) . '">' . $logoImg . '</span>' . "\n";
+                    }
                 } else {
-                    echo '<span class="navbar-brand">' . $logoImg . '</span>' . "\n";
+                    echo '<span class="main-shell__brand-text">' . text($logoTitle) . '</span>' . "\n";
                 }
-            } ?>
-            <button class="navbar-toggler mr-auto" type="button" data-toggle="collapse" data-target="#mainMenu" aria-controls="mainMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="mainMenu" data-bind="template: {name: 'menu-template', data: application_data}"></div>
+                ?>
+            </div>
             <?php if (OEGlobalsBag::getInstance()->get('search_any_patient') != 'none') : ?>
-                <form name="frm_search_globals" class="form-inline">
-                    <div class="input-group">
-                        <input type="text" id="anySearchBox" class="form-control-sm <?php echo $any_search_class ?? '' ?> form-control" name="anySearchBox" placeholder="<?php echo xla("Search by any demographics") ?>" autocomplete="off">
-                        <div class="input-group-append">
-                            <button type="button" id="search_globals" class="btn btn-sm btn-secondary <?php echo $search_globals_class ?? '' ?>" title='<?php echo xla("Search for patient by entering whole or part of any demographics field information"); ?>' data-bind="event: {mousedown: viewPtFinder.bind( $data, '<?php echo xla("The search field cannot be empty. Please enter a search term") ?>', '<?php echo attr($search_any_type ?? ''); ?>')}">
-                                <i class="fa fa-search">&nbsp;</i></button>
+                <div class="main-shell__sidebar-search">
+                    <form name="frm_search_globals" class="form-inline" onsubmit="return false;">
+                        <div class="input-group input-group-sm">
+                            <input type="text" id="anySearchBox" class="form-control-sm <?php echo $any_search_class ?? '' ?> form-control" name="anySearchBox" placeholder="<?php echo xla("Search by any demographics") ?>" autocomplete="off">
+                            <div class="input-group-append">
+                                <button type="button" id="search_globals" class="btn btn-sm btn-secondary <?php echo $search_globals_class ?? '' ?>" title='<?php echo xla("Search for patient by entering whole or part of any demographics field information"); ?>' data-bind="event: {mousedown: viewPtFinder.bind( $data, '<?php echo xla("The search field cannot be empty. Please enter a search term") ?>', '<?php echo attr($search_any_type ?? ''); ?>')}">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                    <span class="sr-only"><?php echo xlt('Search'); ?></span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             <?php endif; ?>
-            <!--Below is the user data section that contains the user information and the attendant data-->
-            <span id="userData" data-bind="template: {name: 'user-data-template', data: application_data}"></span>
-            <?php
-            // fire off a nav event
-            $dispatcher?->dispatch(new RenderEvent(), RenderEvent::EVENT_BODY_RENDER_NAV);
-            ?>
-        </nav>
-        <div id="attendantData" class="body_title acck" data-bind="template: {name: app_view_model.attendant_template_type, data: application_data}"></div>
-        <div class="body_title pt-1" id="tabs_div" data-bind="template: {name: 'tabs-controls', data: application_data}"></div>
-        <div class="mainFrames d-flex flex-row" id="mainFrames_div">
-            <div id="framesDisplay" data-bind="template: {name: 'tabs-frames', data: application_data}"></div>
+            <div class="main-shell__menu-wrap">
+                <nav id="mainMenu" class="main-shell__menu collapse navbar-collapse show" data-bind="template: {name: 'menu-template', data: application_data}" aria-label="<?php echo xla('Application menu'); ?>"></nav>
+            </div>
+            <div class="main-shell__sidebar-user">
+                <span id="userData" data-bind="template: {name: 'user-data-template', data: application_data}"></span>
+            </div>
+            <div id="mainShellNavExtensions" class="main-shell__nav-extensions">
+                <?php
+                // Stable region for modules listening to main.body.render.nav
+                $dispatcher?->dispatch(new RenderEvent(), RenderEvent::EVENT_BODY_RENDER_NAV);
+                ?>
+            </div>
+        </aside>
+        <div class="main-shell__workspace">
+            <div class="main-shell__workspace-bar d-md-none">
+                <button type="button" id="mainShellMenuToggleWorkspace" class="btn btn-sm btn-outline-secondary main-shell__menu-toggle" aria-controls="mainSidebar" aria-expanded="true" title="<?php echo xla('Toggle menu'); ?>">
+                    <i class="fa fa-bars" aria-hidden="true"></i>
+                    <span class="sr-only"><?php echo xlt('Toggle menu'); ?></span>
+                </button>
+            </div>
+            <div id="attendantData" class="body_title acck" data-bind="template: {name: app_view_model.attendant_template_type, data: application_data}"></div>
+            <div class="body_title pt-1" id="tabs_div" data-bind="template: {name: 'tabs-controls', data: application_data}"></div>
+            <div class="mainFrames d-flex flex-row" id="mainFrames_div">
+                <div id="framesDisplay" data-bind="template: {name: 'tabs-frames', data: application_data}"></div>
+            </div>
+            <?php echo $twig->render("product_registration/product_registration_modal.html.twig", [
+                'webroot' => OEGlobalsBag::getInstance()->getWebRoot(),
+                'allowEmail' => $allowEmail ?? false,
+                'allowTelemetry' => $allowTelemetry ?? false]); ?>
         </div>
-        <?php echo $twig->render("product_registration/product_registration_modal.html.twig", [
-            'webroot' => OEGlobalsBag::getInstance()->getWebRoot(),
-            'allowEmail' => $allowEmail ?? false,
-            'allowTelemetry' => $allowTelemetry ?? false]); ?>
     </div>
     <div id="versionFooter" class="text-muted" style="position:fixed; bottom:4px; inset-inline-end:8px; font-size:11px; pointer-events:none; z-index:4;">
         <?php echo $softwareVersion; ?>

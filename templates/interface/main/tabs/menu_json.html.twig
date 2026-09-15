@@ -17,9 +17,49 @@
 ?>
 <script>
 
-    function menu_entry(object)
+    /**
+     * Default Font Awesome icons for top-level main menu labels (vertical shell).
+     * Nested items keep JSON icons (often fa-caret-right) or none.
+     */
+    var mainMenuTopLevelIcons = {
+        'Calendar': 'fa-calendar-alt',
+        'Finder': 'fa-search',
+        'Flow': 'fa-stream',
+        'Recalls': 'fa-phone-alt',
+        'Messages': 'fa-envelope',
+        'Patient': 'fa-user',
+        'Fees': 'fa-file-invoice-dollar',
+        'Modules': 'fa-puzzle-piece',
+        'Procedures': 'fa-notes-medical',
+        'Admin': 'fa-cog',
+        'Reports': 'fa-chart-bar',
+        'Miscellaneous': 'fa-ellipsis-h',
+        'Popups': 'fa-window-restore',
+        'About': 'fa-info-circle'
+    };
+
+    function resolveMenuIcon(object, depth)
+    {
+        if (object.icon && object.icon !== 'fa-caret-right') {
+            return object.icon;
+        }
+        if (depth === 0 && object.label && mainMenuTopLevelIcons[object.label]) {
+            return mainMenuTopLevelIcons[object.label];
+        }
+        // Nested expandable section: use a chevron-style marker only when JSON asked for caret
+        if (depth > 0 && object.icon === 'fa-caret-right') {
+            return 'fa-angle-right';
+        }
+        if (object.icon) {
+            return object.icon;
+        }
+        return '';
+    }
+
+    function menu_entry(object, depth)
     {
         var self=this;
+        depth = typeof depth === 'number' ? depth : 0;
         self.label=ko.observable(object.label);
 
         self.header=false;
@@ -38,11 +78,7 @@
         }
         self.requirement=object.requirement;
 
-        if('icon' in object)
-        {
-            self.icon=object.icon;
-        }
-        self.icon=object.icon;
+        self.icon = resolveMenuIcon(object, depth);
 
         if('helperText' in object)
         {
@@ -88,7 +124,7 @@
             self.children=ko.observableArray();
             for(var childIdx=0;childIdx<object.children.length;childIdx++)
             {
-                var childObj=new menu_entry(object.children[childIdx]);
+                var childObj=new menu_entry(object.children[childIdx], depth + 1);
                 self.children.push(childObj);
             }
         }
@@ -96,7 +132,7 @@
     }
     function process_menu_object(object,target)
     {
-        var newEntry=new menu_entry(object);
+        var newEntry=new menu_entry(object, 0);
         target.push(newEntry);
     }
     var menu_objects={{ menu_restrictions|json_encode }};

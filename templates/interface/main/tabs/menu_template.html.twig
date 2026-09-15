@@ -11,20 +11,32 @@
 #}
 
 <script type="text/html" id="menu-action">
-    <i data-bind="css: icon,text:helperText" class="fa closeButton"></i>
-    <div class='menuLabel px-1' data-bind="text:label,click: menuActionClick,css: {menuDisabled: ! enabled()}"></div>
+    <div class="menuLabel menuLabel--item" data-bind="click: menuActionClick, css: {menuDisabled: !enabled(), 'has-icon': !!icon}">
+        <!-- ko if: icon -->
+        <i class="fa fa-fw menu-item-icon" data-bind="css: icon" aria-hidden="true"></i>
+        <!-- /ko -->
+        <span class="menu-item-text" data-bind="text: label"></span>
+        <!-- ko if: helperText -->
+        <span class="menu-item-helper" data-bind="text: helperText"></span>
+        <!-- /ko -->
+    </div>
 </script>
 <script type="text/html" id="menu-header">
-    <i data-bind="css: icon" class="fa closeButton"></i>
     <div class="menuSection dropdown">
-        <div class='menuLabel px-1 dropdown-toggle oe-dropdown-toggle' data-bind="text:label" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></div>
+        <div class="menuLabel menuLabel--section dropdown-toggle oe-dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-bind="css: {'has-icon': !!icon}">
+            <!-- ko if: icon -->
+            <i class="fa fa-fw menu-item-icon" data-bind="css: icon" aria-hidden="true"></i>
+            <!-- /ko -->
+            <span class="menu-item-text" data-bind="text: label"></span>
+        </div>
         <ul class="menuEntries dropdown-menu rounded-0 border-0" name="menuEntries" data-bind="foreach: children">
-            <li data-bind="template: {name:header ? 'menu-header' : 'menu-action', data: $data }"></li>
+            <li data-bind="template: {name: header ? 'menu-header' : 'menu-action', data: $data }"></li>
         </ul>
     </div>
 </script>
 <script type="text/html" id="menu-template">
-    <div class='appMenu navbar-nav mr-auto' data-bind="foreach: menu">
-        <div data-bind="template: {name:header ? 'menu-header' : 'menu-action', data: $data }"></div>
+    {# appMenu--vertical is activated by shell class on #mainBox; bindings/template IDs unchanged #}
+    <div class="appMenu appMenu--vertical navbar-nav mr-auto" data-bind="foreach: menu">
+        <div data-bind="template: {name: header ? 'menu-header' : 'menu-action', data: $data }"></div>
     </div>
 </script>
