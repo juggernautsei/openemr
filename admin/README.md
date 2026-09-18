@@ -147,3 +147,22 @@ Coverage:
 - `tests/Tests/Isolated/Admin/MultiSiteSetupFlagTest.php` — `OPENEMR_ALLOW_MULTISITE_SETUP` / cloning flags
 - `tests/Tests/Isolated/Common/Environment/EnvFlagTest.php` — env flag parsing
 
+### Integration (DB + HTTP controllers)
+
+Runs under the main `phpunit.xml` **controllers** suite (needs default site DB).
+HTTP tests also need a reachable OpenEMR base URL (auto-skips if down).
+
+```bash
+# Inside development-easy container (DB available):
+./vendor/bin/phpunit -c phpunit.xml --testsuite controllers --filter 'AdminAuthServiceIntegrationTest|AdminBootstrapIntegrationTest|AdminHttpIntegrationTest'
+
+# Optional env:
+#   OE_USER / OE_PASS (default admin/pass)
+#   OPENEMR_BASE_URL or OPENEMR_BASE_URL_ADMIN (default http://localhost)
+```
+
+Coverage:
+- `tests/Tests/Controllers/Admin/AdminAuthServiceIntegrationTest.php` — authenticate, session, timeout, IP/UA bind
+- `tests/Tests/Controllers/Admin/AdminBootstrapIntegrationTest.php` — site_id default, CSRF ensure, auth gate
+- `tests/Tests/Controllers/Admin/AdminHttpIntegrationTest.php` — login/index/logout CSRF HTTP flows
+
