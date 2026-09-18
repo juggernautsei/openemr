@@ -29,10 +29,23 @@
             $site_id = $valid_site_ids[0];
             break;
         default:
-            $site_id = filter_input(INPUT_GET, 'site') ?: (filter_input(INPUT_SERVER, 'HTTP_HOST') ?: 'default');
-            if (!in_array($site_id, $valid_site_ids, true)) {
-                throw new RuntimeException('Invalid site id');
-            };
+            // Prefer explicit ?site=, then host-named site dirs, then default hub.
+            // A generic vhost (e.g. sites.example.com) is not a site id — match globals.php
+            // behavior and fall back to default when the host is not a configured site.
+            $requested = filter_input(INPUT_GET, 'site');
+            if (!is_string($requested) || $requested === '') {
+                $host = filter_input(INPUT_SERVER, 'HTTP_HOST');
+                $requested = (is_string($host) && $host !== '') ? $host : 'default';
+            }
+            if (in_array($requested, $valid_site_ids, true)) {
+                $site_id = $requested;
+            } elseif (in_array('default', $valid_site_ids, true)) {
+                $site_id = 'default';
+            } else {
+                throw new RuntimeException(
+                    'Invalid site id. Use ?site=<id> with one of: ' . implode(', ', $valid_site_ids)
+                );
+            }
     }
     require_once "sites/{$site_id}/sqlconf.php";
     /** @var int $config Defined in sqlconf.php */
