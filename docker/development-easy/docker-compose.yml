@@ -80,6 +80,8 @@ services:
       SELENIUM_FORCE_HEADLESS: "false"
       SELENIUM_BASE_URL: "http://openemr"
       OPENEMR_DOCKER_ENV_TAG: easy-dev-docker
+      # Ops-only: allow setup.php non-default site IDs (multi-site). Not a UI global.
+      OPENEMR_ALLOW_MULTISITE_SETUP: "1"
       OPENEMR_SETTING_site_addr_oath: 'https://localhost:${WT_HTTPS_PORT:-9300}'
       OPENEMR_SETTING_oauth_password_grant: 3
       OPENEMR_SETTING_rest_system_scopes_api: 1

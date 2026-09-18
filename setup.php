@@ -46,29 +46,30 @@ ini_set('max_execution_time', 0);
 ini_set('display_errors', 0);
 set_time_limit(0);
 
-// Warning. If you set $allow_multisite_setup to true, this is a potential security vulnerability.
-// Recommend setting it back to false (or removing this setup.php script entirely) after you
-//  are done with the multisite procedure.
-$allow_multisite_setup = false;
-
-// Warning. If you set $allow_cloning_setup to true, this is a potential security vulnerability.
-// Recommend setting it back to false (or removing this setup.php script entirely) after you
-//  are done with the cloning setup procedure.
-$allow_cloning_setup = false;
-
-// Include standard libraries/classes
+// Include standard libraries/classes before resolving setup feature flags.
 require_once __DIR__ . "/vendor/autoload.php";
 
 use OpenEMR\BC\ServiceContainer;
 use OpenEMR\Common\Csrf\CsrfUtils;
+use OpenEMR\Common\Environment\EnvFlag;
 use OpenEMR\Common\Session\SessionUtil;
 use OpenEMR\Common\Session\SessionWrapperFactory;
 use OpenEMR\Common\Utils\RandomGenUtils;
 
+// Multi-site / clone setup are high-risk. Enable only via ops environment (not Admin → Config):
+//   OPENEMR_ALLOW_MULTISITE_SETUP=1
+//   OPENEMR_ALLOW_CLONING_SETUP=1
+// Apache: SetEnv OPENEMR_ALLOW_MULTISITE_SETUP 1
+// PHP-FPM: env[OPENEMR_ALLOW_MULTISITE_SETUP] = 1
+// Docker: environment: OPENEMR_ALLOW_MULTISITE_SETUP: "1"
+// Leave unset/off in production once site provisioning is complete when practical.
+$allow_multisite_setup = EnvFlag::isEnabled('OPENEMR_ALLOW_MULTISITE_SETUP');
+$allow_cloning_setup = EnvFlag::isEnabled('OPENEMR_ALLOW_CLONING_SETUP');
+
 if (!$allow_cloning_setup && !empty($_REQUEST['clone_database'])) {
     SessionUtil::setupScriptSessionStart();
     SessionUtil::setupScriptSessionCookieDestroy();
-    die("To turn on support for cloning setup, need to edit this script and change \$allow_cloning_setup to true. After you are done setting up the cloning, ensure you change \$allow_cloning_setup back to false or remove this script altogether");
+    die("Cloning setup is disabled. Set environment variable OPENEMR_ALLOW_CLONING_SETUP=1 to enable temporarily, then turn it off after provisioning.");
 }
 
 function recursive_writable_directory_test($dir)
@@ -248,7 +249,7 @@ if (empty($site_id) || preg_match('/[^A-Za-z0-9\\-.]/', $site_id)) {
 if (!$allow_multisite_setup && $site_id != 'default') {
     SessionUtil::setupScriptSessionStart();
     SessionUtil::setupScriptSessionCookieDestroy();
-    die("To turn on support for multisite setup, need to edit this script and change \$allow_multisite_setup to true. After you are done setting up the cloning, ensure you change \$allow_multisite_setup back to false or remove this script altogether");
+    die("Multi-site setup is disabled. Set environment variable OPENEMR_ALLOW_MULTISITE_SETUP=1 (Apache SetEnv / container env) to enable site provisioning. Prefer leaving it off when not actively adding sites.");
 }
 
 // Disable file and directory permissions check by setting to false

@@ -187,10 +187,17 @@
                     </a>
                 </li>
                 <li>
+                    {% if multisite_setup_enabled|default(false) %}
                     <a href="index.php#add-site" class="{% if nav_active|default('') == 'add-site' %}is-active{% endif %}">
                         <i class="fa fa-plus-circle" aria-hidden="true"></i>
                         <span>{{ 'Add New Site'|xlt }}</span>
                     </a>
+                    {% else %}
+                    <span class="nav-disabled" title="{{ 'Enable OPENEMR_ALLOW_MULTISITE_SETUP=1 in environment to add sites'|xlt }}">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span>{{ 'Add New Site'|xlt }}</span>
+                    </span>
+                    {% endif %}
                 </li>
                 <li>
                     <span class="nav-disabled" title="{{ 'Poppy-only for now'|xlt }}">

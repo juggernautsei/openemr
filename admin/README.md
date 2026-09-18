@@ -104,6 +104,23 @@ CSS hooks: `.admin-shell`, `.admin-shell__sidebar`, `.admin-shell__workspace`,
 - Row states: needs setup / error / upgrade (DB|ACL|patch) / current
 - Add New Site block posts to `setup.php` with CSRF
 
+## Enabling multi-site setup (ops env — not UI config)
+
+OpenEMR multi-site **provisioning** is gated by environment flags, not Admin → Config.
+That keeps clinic staff from turning it off/on without understanding the blast radius.
+
+| Variable | Effect |
+|----------|--------|
+| `OPENEMR_ALLOW_MULTISITE_SETUP=1` | `setup.php` accepts non-`default` site IDs; admin "Add New Site" is active |
+| `OPENEMR_ALLOW_CLONING_SETUP=1` | Allows clone-database path in setup (higher risk) |
+
+Set via container `environment`, Apache `SetEnv`, or PHP-FPM `env[...]`.
+Product Docker easy-dev enables `OPENEMR_ALLOW_MULTISITE_SETUP` by default.
+
+**Note:** Legacy `OPENEMR_ADMIN_PHP_ENABLED` only unlocked the old unauthenticated
+root `admin.php`. This product build always uses authenticated `/admin` instead;
+that flag is not required for the multi-site admin UI.
+
 ## Optional cache table
 
 Apply `sql/admin_site_status_cache.sql` to the **default** site database for

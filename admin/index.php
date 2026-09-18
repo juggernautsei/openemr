@@ -13,6 +13,7 @@ declare(strict_types=1);
 use OpenEMR\Admin\AdminAuthService;
 use OpenEMR\Admin\SiteAdministrationService;
 use OpenEMR\Admin\SiteStatusCacheService;
+use OpenEMR\Common\Environment\EnvFlag;
 use OpenEMR\Common\Twig\TwigContainer;
 use OpenEMR\Core\OEGlobalsBag;
 
@@ -79,7 +80,8 @@ if ($sitesInfo === null) {
 $webroot = OEGlobalsBag::getInstance()->getWebRoot();
 $templateVars = [
     'sites' => $sitesInfo,
-    'show_add_site_button' => true,
+    'show_add_site_button' => EnvFlag::isEnabled('OPENEMR_ALLOW_MULTISITE_SETUP'),
+    'multisite_setup_enabled' => EnvFlag::isEnabled('OPENEMR_ALLOW_MULTISITE_SETUP'),
     'webroot' => $webroot,
     'authenticated' => true,
     'admin_shell' => true,
