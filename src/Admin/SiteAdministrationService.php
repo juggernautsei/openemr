@@ -18,8 +18,27 @@ class SiteAdministrationService
     private const READ_TIMEOUT = 10;
     private const VALID_SITE_NAME_PATTERN = '/^[a-zA-Z0-9._-]+$/';
 
-    public function __construct(private readonly string $sitesBaseDir)
-    {
+    private readonly int $appDatabaseVersion;
+    private readonly int $appAclVersion;
+    private readonly int $appRealPatch;
+
+    /**
+     * @param string $sitesBaseDir Absolute path to the sites/ directory
+     * @param int|null $appDatabaseVersion Application $v_database from version.php
+     * @param int|null $appAclVersion Application $v_acl from version.php
+     * @param int|null $appRealPatch Application $v_realpatch from version.php
+     */
+    public function __construct(
+        private readonly string $sitesBaseDir,
+        ?int $appDatabaseVersion = null,
+        ?int $appAclVersion = null,
+        ?int $appRealPatch = null
+    ) {
+        // Prefer explicit constructor args; fall back to version.php globals if present.
+        global $v_database, $v_acl, $v_realpatch;
+        $this->appDatabaseVersion = $appDatabaseVersion ?? (int) ($v_database ?? 0);
+        $this->appAclVersion = $appAclVersion ?? (int) ($v_acl ?? 0);
+        $this->appRealPatch = $appRealPatch ?? (int) ($v_realpatch ?? 0);
     }
 
     public function isValidSiteName(string $siteName): bool
@@ -72,7 +91,13 @@ class SiteAdministrationService
      *   error: string,
      *   requires_upgrade: bool,
      *   upgrade_type: string,
-     *   is_current: bool
+     *   is_current: bool,
+     *   app_database: int,
+     *   site_database: int,
+     *   app_acl: int,
+     *   site_acl: int,
+     *   app_patch: int,
+     *   site_patch: int
      * }
      */
     public function getSiteInfo(string $siteName, string $sqlconfPath): array
@@ -87,6 +112,12 @@ class SiteAdministrationService
             'requires_upgrade' => false,
             'upgrade_type' => '',
             'is_current' => false,
+            'app_database' => $this->appDatabaseVersion,
+            'site_database' => 0,
+            'app_acl' => $this->appAclVersion,
+            'site_acl' => 0,
+            'app_patch' => $this->appRealPatch,
+            'site_patch' => 0,
         ];
 
         $config = null;
@@ -122,12 +153,14 @@ class SiteAdministrationService
         $row = $this->sqlQuery("SHOW TABLES LIKE 'version'", $dbh);
         if ($row === null) {
             mysqli_close($dbh);
+            $siteInfo['error'] = 'Version table missing';
             return $siteInfo;
         }
 
         $row = $this->sqlQuery('SELECT * FROM version LIMIT 1', $dbh);
         if ($row === null) {
             mysqli_close($dbh);
+            $siteInfo['error'] = 'Version row missing';
             return $siteInfo;
         }
 
@@ -136,23 +169,26 @@ class SiteAdministrationService
             $patchText = ' (' . $row['v_realpatch'] . ')';
         }
 
-        $siteInfo['version'] = $row['v_major'] . '.' . $row['v_minor'] . '.' .
-            $row['v_patch'] . ($row['v_tag'] ?? '') . $patchText;
+        $siteInfo['version'] = ($row['v_major'] ?? '') . '.' . ($row['v_minor'] ?? '') . '.' .
+            ($row['v_patch'] ?? '') . ($row['v_tag'] ?? '') . $patchText;
 
-        $databaseVersion = (int) $row['v_database'];
-        $databaseAcl = (int) $row['v_acl'];
-        $databasePatch = (int) $row['v_realpatch'];
+        $databaseVersion = (int) ($row['v_database'] ?? 0);
+        $databaseAcl = (int) ($row['v_acl'] ?? 0);
+        $databasePatch = (int) ($row['v_realpatch'] ?? 0);
 
-        // Application version constants from version.php (loaded by caller).
-        global $v_database, $v_acl, $v_realpatch;
+        $siteInfo['site_database'] = $databaseVersion;
+        $siteInfo['site_acl'] = $databaseAcl;
+        $siteInfo['site_patch'] = $databasePatch;
 
-        if ((int) $v_database !== $databaseVersion) {
+        // Same rules as legacy admin.php:
+        // current iff app DB version matches, app ACL <= site ACL, app patch matches.
+        if ($this->appDatabaseVersion !== $databaseVersion) {
             $siteInfo['requires_upgrade'] = true;
             $siteInfo['upgrade_type'] = 'database';
-        } elseif ((int) $v_acl > $databaseAcl) {
+        } elseif ($this->appAclVersion > $databaseAcl) {
             $siteInfo['requires_upgrade'] = true;
             $siteInfo['upgrade_type'] = 'acl';
-        } elseif ((int) $v_realpatch !== $databasePatch) {
+        } elseif ($this->appRealPatch !== $databasePatch) {
             $siteInfo['requires_upgrade'] = true;
             $siteInfo['upgrade_type'] = 'patch';
         } else {

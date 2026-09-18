@@ -94,27 +94,33 @@
                                 {% if site.upgrade_type == 'database' %}
                                     <td>
                                         <a href="{{ webroot }}/sql_upgrade.php?site={{ site.site_id|url_encode }}" class="btn btn-warning btn-sm">
-                                            <i class="fa fa-arrow-up"></i> {{ 'Upgrade Database'|xlt }}
+                                            <i class="fa fa-arrow-up" aria-hidden="true"></i> {{ 'Upgrade Database'|xlt }}
                                         </a>
                                     </td>
                                 {% elseif site.upgrade_type == 'acl' %}
                                     <td>
                                         <a href="{{ webroot }}/acl_upgrade.php?site={{ site.site_id|url_encode }}" class="btn btn-warning btn-sm">
-                                            <i class="fa fa-shield-alt"></i> {{ 'Upgrade Access Controls'|xlt }}
+                                            <i class="fa fa-shield-alt" aria-hidden="true"></i> {{ 'Upgrade Access Controls'|xlt }}
                                         </a>
                                     </td>
                                 {% elseif site.upgrade_type == 'patch' %}
                                     <td>
                                         <a href="{{ webroot }}/sql_patch.php?site={{ site.site_id|url_encode }}" class="btn btn-warning btn-sm">
-                                            <i class="fa fa-wrench"></i> {{ 'Patch Database'|xlt }}
+                                            <i class="fa fa-wrench" aria-hidden="true"></i> {{ 'Patch Database'|xlt }}
                                         </a>
                                     </td>
                                 {% else %}
                                     <td class="text-warning">{{ 'Upgrade Required'|xlt }}</td>
                                 {% endif %}
+                            {% elseif site.is_current %}
+                                <td class="text-success font-weight-bold" title="{{ 'Site database matches application version'|xlt }}">
+                                    <i class="fa fa-check-circle fa-lg" aria-hidden="true"></i>
+                                    <span class="sr-only">{{ 'Current'|xlt }}</span>
+                                </td>
                             {% else %}
-                                <td>
-                                    <i class="fa fa-check-circle fa-lg text-success" aria-hidden="true"></i>
+                                <td class="text-muted" title="{{ 'Unable to determine site currency'|xlt }}">
+                                    &mdash;
+                                    <span class="sr-only">{{ 'Unknown'|xlt }}</span>
                                 </td>
                             {% endif %}
 

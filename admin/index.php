@@ -72,7 +72,12 @@ $sitesInfo = $cacheService->getCachedSitesInfo();
 $usingCache = true;
 if ($sitesInfo === null) {
     $usingCache = false;
-    $service = new SiteAdministrationService($oeSitesBase);
+    $service = new SiteAdministrationService(
+        $oeSitesBase,
+        (int) $v_database,
+        (int) $v_acl,
+        (int) $v_realpatch
+    );
     $sitesInfo = $service->getAllSitesInfo();
     $cacheService->writeCache($sitesInfo);
 }
