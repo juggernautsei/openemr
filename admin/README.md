@@ -16,6 +16,7 @@ Secure multi-site administration for OpenEMR 8.4 product builds on
 - Credentials: default-site user with Administrators / `admin` super ACL
 - Session rotate on login; IP/UA binding; 30-minute timeout; privilege recheck
 - CSRF subjects: `admin_login`, `admin_dashboard`, `admin_add_site`
+- CSRF private key is created once per session (`admin_ensure_csrf_key`); it is **not** rotated on every page load (that broke login with 403)
 - Logout and cache refresh are **POST + CSRF only** (GET rejected with 405)
 
 ## Layout (code)

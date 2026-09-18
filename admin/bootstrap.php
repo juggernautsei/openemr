@@ -56,9 +56,22 @@ function admin_bootstrap_default_site(): array
         $session = SessionWrapperFactory::getInstance()->getActiveSession();
     }
 
-    CsrfUtils::setupCsrfKey($session);
+    // Only create the private CSRF key when missing. Regenerating on every
+    // request invalidates the token embedded in the login form and causes 403.
+    admin_ensure_csrf_key($session);
 
     return [$session, new AdminAuthService()];
+}
+
+/**
+ * Ensure a CSRF private key exists without rotating an existing one.
+ */
+function admin_ensure_csrf_key(SessionInterface $session): void
+{
+    $privateKey = $session->get('csrf_private_key', null);
+    if ($privateKey === null || $privateKey === '') {
+        CsrfUtils::setupCsrfKey($session);
+    }
 }
 
 /**
