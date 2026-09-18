@@ -1,0 +1,270 @@
+{#
+ # Base template for multi-site admin area (optional left-nav shell).
+ # @package OpenEMR
+ #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ 'OpenEMR Administration'|xlt }}{% endblock %}</title>
+    {% block head %}
+        {{ setupHeader(['no_main-theme']) }}
+    {% endblock %}
+    {% block css %}
+    <style type="text/css">
+        :root {
+            --admin-rail: #0b3d91;
+            --admin-rail-width: 15.5rem;
+        }
+        body.admin-container {
+            margin: 0;
+            background-color: #f0f2f5;
+            min-height: 100vh;
+        }
+        .admin-shell {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+        .admin-shell__sidebar {
+            flex: 0 0 var(--admin-rail-width);
+            width: var(--admin-rail-width);
+            max-width: var(--admin-rail-width);
+            background: linear-gradient(180deg, var(--admin-rail) 0%, #082a63 55%, #0a5c58 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            z-index: 20;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.12);
+        }
+        .admin-shell__brand {
+            padding: 1.1rem 1rem 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+            text-align: center;
+        }
+        .admin-shell__brand-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: 0.04em;
+            margin: 0;
+        }
+        .admin-shell__brand-sub {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            margin: 0.25rem 0 0;
+        }
+        .admin-shell__nav {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding: 0.75rem 0.5rem;
+        }
+        .admin-shell__nav-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            opacity: 0.65;
+            padding: 0.35rem 0.85rem 0.5rem;
+            margin: 0;
+        }
+        .admin-shell__nav-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .admin-shell__nav-list a {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            color: rgba(255, 255, 255, 0.92);
+            text-decoration: none;
+            padding: 0.55rem 0.85rem;
+            border-radius: 0.45rem;
+            margin: 0.15rem 0;
+            font-weight: 500;
+            transition: background 0.15s ease;
+        }
+        .admin-shell__nav-list a:hover,
+        .admin-shell__nav-list a:focus {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            text-decoration: none;
+        }
+        .admin-shell__nav-list a.is-active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: inset 3px 0 0 #5eead4;
+            font-weight: 600;
+        }
+        .admin-shell__nav-list a i {
+            width: 1.15rem;
+            text-align: center;
+        }
+        .admin-shell__nav-list .nav-disabled {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding: 0.55rem 0.85rem;
+            margin: 0.15rem 0;
+            border-radius: 0.45rem;
+            color: rgba(255, 255, 255, 0.45);
+            cursor: not-allowed;
+            font-size: 0.92rem;
+        }
+        .admin-shell__sidebar-foot {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 0.85rem 1rem 1rem;
+        }
+        .admin-shell__user {
+            font-size: 0.85rem;
+            margin-bottom: 0.55rem;
+            word-break: break-word;
+        }
+        .admin-shell__workspace {
+            flex: 1 1 auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .admin-shell__topbar {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.55rem 0.85rem;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .admin-shell__main {
+            flex: 1 1 auto;
+            padding: 1.25rem 1.5rem 2rem;
+        }
+        @media (max-width: 768px) {
+            .admin-shell__sidebar {
+                position: fixed;
+                inset-block: 0;
+                inset-inline-start: 0;
+                transform: translateX(-105%);
+                transition: transform 0.2s ease;
+                width: min(16.5rem, 88vw);
+                max-width: min(16.5rem, 88vw);
+                flex-basis: auto;
+            }
+            .admin-shell.is-nav-open .admin-shell__sidebar {
+                transform: translateX(0);
+            }
+            .admin-shell__topbar { display: flex; }
+            .admin-shell.is-nav-open .admin-shell__workspace::before {
+                content: "";
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.35);
+                z-index: 15;
+            }
+            .admin-shell__main { padding: 1rem; }
+        }
+    </style>
+    {% endblock %}
+</head>
+<body class="admin-container">
+{% block pre_content %}{% endblock %}
+
+{% if admin_shell|default(false) %}
+<div class="admin-shell" id="adminShell">
+    <aside class="admin-shell__sidebar" id="adminSidebar" aria-label="{{ 'Administration navigation'|xlt }}">
+        <div class="admin-shell__brand">
+            <p class="admin-shell__brand-title">{{ 'TAREVO'|xlt }}</p>
+            <p class="admin-shell__brand-sub">{{ 'Multi-Site Admin'|xlt }}</p>
+        </div>
+        <nav class="admin-shell__nav">
+            <p class="admin-shell__nav-label">{{ 'Navigation'|xlt }}</p>
+            <ul class="admin-shell__nav-list">
+                <li>
+                    <a href="index.php" class="{% if nav_active|default('') == 'sites' %}is-active{% endif %}">
+                        <i class="fa fa-th-list" aria-hidden="true"></i>
+                        <span>{{ 'Sites'|xlt }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="index.php#add-site" class="{% if nav_active|default('') == 'add-site' %}is-active{% endif %}">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        <span>{{ 'Add New Site'|xlt }}</span>
+                    </a>
+                </li>
+                <li>
+                    <span class="nav-disabled" title="{{ 'Poppy-only for now'|xlt }}">
+                        <i class="fa fa-calendar-alt" aria-hidden="true"></i>
+                        <span>{{ 'Statement Schedules'|xlt }}</span>
+                    </span>
+                </li>
+            </ul>
+            <p class="admin-shell__nav-label mt-3">{{ 'Resources'|xlt }}</p>
+            <ul class="admin-shell__nav-list">
+                <li>
+                    <a href="{{ webroot|default('') }}/Documentation/help_files/openemr_multisite_admin_help.php" target="_blank" rel="noopener">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i>
+                        <span>{{ 'Help'|xlt }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ webroot|default('') }}/interface/login/login.php?site=default" target="_blank" rel="noopener">
+                        <i class="fa fa-clinic-medical" aria-hidden="true"></i>
+                        <span>{{ 'Clinic login'|xlt }}</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="admin-shell__sidebar-foot">
+            <div class="admin-shell__user">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                {{ username|default('')|text }}
+            </div>
+            {% block admin_sidebar_actions %}
+            <form method="post" action="index.php" class="mb-0">
+                {{ csrfToken('admin_dashboard', 'csrf_token_form') }}
+                <input type="hidden" name="admin_action" value="logout">
+                <button type="submit" name="logout" value="1" class="btn btn-sm btn-outline-light btn-block">
+                    <i class="fa fa-sign-out-alt"></i> {{ 'Logout'|xlt }}
+                </button>
+            </form>
+            {% endblock %}
+        </div>
+    </aside>
+    <div class="admin-shell__workspace">
+        <div class="admin-shell__topbar">
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="adminNavToggle" aria-controls="adminSidebar" aria-expanded="false">
+                <i class="fa fa-bars" aria-hidden="true"></i>
+                <span class="sr-only">{{ 'Toggle menu'|xlt }}</span>
+            </button>
+            <strong>{{ 'Multi-Site Administration'|xlt }}</strong>
+        </div>
+        <main class="admin-shell__main">
+{% endif %}
+
+            {% block content %}{% endblock %}
+
+{% if admin_shell|default(false) %}
+        </main>
+    </div>
+</div>
+{% endif %}
+
+{% block post_content %}{% endblock %}
+</body>
+{% block post_body %}
+{% if admin_shell|default(false) %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var shell = document.getElementById('adminShell');
+    var btn = document.getElementById('adminNavToggle');
+    if (!shell || !btn) return;
+    btn.addEventListener('click', function () {
+        var open = shell.classList.toggle('is-nav-open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+});
+</script>
+{% endif %}
+{% endblock %}
+</html>
