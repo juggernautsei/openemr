@@ -180,24 +180,54 @@ class SiteAdministrationService
         $siteInfo['site_acl'] = $databaseAcl;
         $siteInfo['site_patch'] = $databasePatch;
 
-        // Same rules as legacy admin.php:
-        // current iff app DB version matches, app ACL <= site ACL, app patch matches.
-        if ($this->appDatabaseVersion !== $databaseVersion) {
-            $siteInfo['requires_upgrade'] = true;
-            $siteInfo['upgrade_type'] = 'database';
-        } elseif ($this->appAclVersion > $databaseAcl) {
-            $siteInfo['requires_upgrade'] = true;
-            $siteInfo['upgrade_type'] = 'acl';
-        } elseif ($this->appRealPatch !== $databasePatch) {
-            $siteInfo['requires_upgrade'] = true;
-            $siteInfo['upgrade_type'] = 'patch';
-        } else {
-            $siteInfo['is_current'] = true;
-        }
+        $currency = $this->evaluateVersionStatus($databaseVersion, $databaseAcl, $databasePatch);
+        $siteInfo['requires_upgrade'] = $currency['requires_upgrade'];
+        $siteInfo['upgrade_type'] = $currency['upgrade_type'];
+        $siteInfo['is_current'] = $currency['is_current'];
 
         mysqli_close($dbh);
 
         return $siteInfo;
+    }
+
+    /**
+     * Compare a site DB version row to the application version (legacy admin.php rules).
+     *
+     * Current when: app database == site database, app ACL <= site ACL, app patch == site patch.
+     *
+     * @return array{requires_upgrade: bool, upgrade_type: string, is_current: bool}
+     */
+    public function evaluateVersionStatus(int $siteDatabase, int $siteAcl, int $sitePatch): array
+    {
+        if ($this->appDatabaseVersion !== $siteDatabase) {
+            return [
+                'requires_upgrade' => true,
+                'upgrade_type' => 'database',
+                'is_current' => false,
+            ];
+        }
+
+        if ($this->appAclVersion > $siteAcl) {
+            return [
+                'requires_upgrade' => true,
+                'upgrade_type' => 'acl',
+                'is_current' => false,
+            ];
+        }
+
+        if ($this->appRealPatch !== $sitePatch) {
+            return [
+                'requires_upgrade' => true,
+                'upgrade_type' => 'patch',
+                'is_current' => false,
+            ];
+        }
+
+        return [
+            'requires_upgrade' => false,
+            'upgrade_type' => '',
+            'is_current' => true,
+        ];
     }
 
     /**

@@ -131,3 +131,19 @@ load). Full install/upgrade wiring is backlog **P0.3**.
 
 - Statement release schedules (Poppy-only)
 - Upstream PR of this admin UI (product fork unless decided later)
+
+## Tests
+
+Isolated PHPUnit suite (no DB):
+
+```bash
+./vendor/bin/phpunit -c phpunit-isolated.xml --filter 'SiteAdministrationServiceTest|EnvFlagTest|MultiSiteSetupFlagTest'
+# or
+composer phpunit-isolated -- --filter 'SiteAdministrationServiceTest|EnvFlagTest|MultiSiteSetupFlagTest'
+```
+
+Coverage:
+- `tests/Tests/Isolated/Admin/SiteAdministrationServiceTest.php` — discovery, needs_setup, Is Current rules
+- `tests/Tests/Isolated/Admin/MultiSiteSetupFlagTest.php` — `OPENEMR_ALLOW_MULTISITE_SETUP` / cloning flags
+- `tests/Tests/Isolated/Common/Environment/EnvFlagTest.php` — env flag parsing
+
