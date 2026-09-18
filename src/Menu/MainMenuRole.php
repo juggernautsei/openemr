@@ -130,9 +130,11 @@ class MainMenuRole extends MenuRole
     //
     protected function updateVisitForms(&$menu_list)
     {
+        // Global helper lives in library/forms.inc.php (not namespaced).
+        require_once OEGlobalsBag::getInstance()->getKernel()->getProjectDir() . '/library/forms.inc.php';
         $menu_list->children = [];
         $reglastcat = '';
-        $regrows = getFormsByCategory('1', false);
+        $regrows = \getFormsByCategory('1', false);
         foreach ($regrows as $entry) {
             $option_id = $entry['directory'];
             $nickname = is_string($entry['nickname'] ?? null) ? trim($entry['nickname']) : '';
@@ -183,8 +185,9 @@ class MainMenuRole extends MenuRole
     protected function updateBlankForms(&$menu_list)
     {
         // Generate the Blank Form items for visit forms, both traditional and LBF.
+        require_once OEGlobalsBag::getInstance()->getKernel()->getProjectDir() . '/library/forms.inc.php';
         $reglastcat = '';
-        $regrows = getFormsByCategory('1', true);
+        $regrows = \getFormsByCategory('1', true);
         foreach ($regrows as $entry) {
             $option_id = $entry['directory'];
             $nickname = is_string($entry['nickname'] ?? null) ? trim($entry['nickname']) : '';
