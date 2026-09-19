@@ -1526,10 +1526,10 @@ final readonly class CalendarViewModel
      *
      *  - The wrapping `<span class='appointment...'>` includes the
      *    consumer-built apptToggle suffix (legacy $apptToggle).
-     *  - Patient-appointment branch emits an extra anchor:
-     *      <a class="show-appointment shown">...</a>
-     *    placed inside the patient link block. The "shown" class
-     *    indicates initial visibility — JS code toggles this.
+     *  - Patient-appointment branch emits an extra anchor after the
+     *    patient goPid link (not nested inside it):
+     *      <a class="show-appointment shown"></a>
+     *    The "shown" class indicates initial visibility — JS toggles this.
      *
      * catid 99 → event_holiday is handled by eventClassForCategory
      * (which branches on viewType), so the consumer passes the
