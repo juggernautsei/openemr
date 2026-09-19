@@ -1526,10 +1526,10 @@ final readonly class CalendarViewModel
      *
      *  - The wrapping `<span class='appointment...'>` includes the
      *    consumer-built apptToggle suffix (legacy $apptToggle).
-     *  - Patient-appointment branch emits an extra anchor:
-     *      <a class="show-appointment shown">...</a>
-     *    placed inside the patient link block. The "shown" class
-     *    indicates initial visibility — JS code toggles this.
+     *  - Patient-appointment branch emits an extra anchor after the
+     *    patient goPid link (not nested inside it):
+     *      <a class="show-appointment shown"></a>
+     *    The "shown" class indicates initial visibility — JS toggles this.
      *
      * catid 99 → event_holiday is handled by eventClassForCategory
      * (which branches on viewType), so the consumer passes the
@@ -1660,10 +1660,6 @@ final readonly class CalendarViewModel
             $imageHref = $this->patientPhotoHoverHref($event, $patientIdAttr, $webroot);
             $content .= "<i class='fas fa-user text-success' onmouseover=\"javascript:ShowImage(" . attr_js($imageHref) . ");\" onmouseout=\"javascript:HideImage();\" title='" . $linkTitle . "'></i>";
 
-            // Week-specific: the show-appointment toggle anchor between
-            // the icon and the patient name.
-            $content .= "<a class='show-appointment shown'></a>";
-
             if ($catid === 1) {
                 $content .= '<s>';
             }
@@ -1692,6 +1688,11 @@ final readonly class CalendarViewModel
                 $content .= '</s>';
             }
             $content .= '</a>';
+
+            // Week-specific show/hide toggle. Must NOT nest inside the patient
+            // <a> — nested anchors are invalid HTML and browsers close the
+            // outer link early so the patient name is no longer clickable.
+            $content .= "<a class='show-appointment shown'></a>";
         } elseif ($hasGroup) {
             $groupName = is_string($event['group_name'] ?? null) ? $event['group_name'] : '';
             $groupTypeName = is_string($event['group_type_name'] ?? null) ? $event['group_type_name'] : '';
