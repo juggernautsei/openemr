@@ -317,17 +317,24 @@ if (empty($siteId) || !empty($_GET['site'])) {
     }
 
     if ($siteId !== null && $siteId != $tmp) {
-        // This is to prevent using session to penetrate other OpenEMR instances within same multisite module
-        SessionUtil::clearSession();
-        if (isset($landingpage) && !empty($landingpage)) {
-            // OpenEMR Patient Portal use
-            header('Location: index.php?site=' . urlencode((string)$tmp));
-        } else {
-            // Main OpenEMR use
-            header('Location: ../login/login.php?site=' . urlencode((string)$tmp)); // Assuming in the interface/main directory
-        }
+        // Session already bound to another site. Clinic UI must not silently
+        // switch sites (session fixation across multi-site). Auth-bypassed
+        // entry points (sql_upgrade, sql_patch, acl_upgrade, multi-site admin
+        // helpers with $ignoreAuth) legitimately pass ?site= and must proceed.
+        if (empty($ignoreAuth) && empty($ignoreAuth_onsite_portal)) {
+            SessionUtil::clearSession();
+            if (isset($landingpage) && !empty($landingpage)) {
+                // OpenEMR Patient Portal use
+                header('Location: index.php?site=' . urlencode((string)$tmp));
+            } else {
+                // Absolute path from web root — relative ../login breaks when
+                // the request is not under interface/main/ (e.g. sql_upgrade).
+                header('Location: ' . $web_root . '/interface/login/login.php?site=' . urlencode((string)$tmp));
+            }
 
-        exit(1);
+            exit(1);
+        }
+        // ignoreAuth: adopt the requested site for this request/session.
     }
 
     if ($siteId === null || $siteId != $tmp) {
