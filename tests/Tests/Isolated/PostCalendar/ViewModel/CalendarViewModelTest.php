@@ -1314,8 +1314,7 @@ final class CalendarViewModelTest extends TestCase
     public function testBuildWeekScreenEventContentEmitsShowAppointmentToggleForPatient(): void
     {
         // Patient-appt branch gets an extra `<a class="show-appointment shown">`
-        // anchor between the picture-hover icon and the patient name. Not in
-        // day-screen.
+        // after the patient name link (not nested inside it). Not in day-screen.
         $GLOBALS['disable_translation'] = true;
         $vm = new CalendarViewModel(viewType: ViewType::Week, firstDayOfWeek: 0);
 
@@ -1337,6 +1336,20 @@ final class CalendarViewModelTest extends TestCase
         $result = $vm->buildWeekScreenEventContent($event, 1, '/tpl/img', '/openemr');
 
         self::assertStringContainsString("<a class='show-appointment shown'></a>", $result['content']);
+        self::assertStringContainsString("href='javascript:goPid(", $result['content']);
+        self::assertStringContainsString('Doe', $result['content']);
+
+        // Patient name must sit inside the goPid link (not after a nested <a> closed it).
+        $goPidPos = strpos($result['content'], "href='javascript:goPid(");
+        $namePos = strpos($result['content'], 'Doe');
+        $closeLinkPos = $goPidPos !== false ? strpos($result['content'], '</a>', $goPidPos) : false;
+        $togglePos = strpos($result['content'], "<a class='show-appointment shown'></a>");
+        self::assertNotFalse($goPidPos);
+        self::assertNotFalse($namePos);
+        self::assertNotFalse($closeLinkPos);
+        self::assertNotFalse($togglePos);
+        self::assertLessThan($closeLinkPos, $namePos);
+        self::assertGreaterThan($closeLinkPos, $togglePos);
     }
 
     public function testBuildWeekScreenEventContentForVacationCategoryHasNoSpanWrapperOrToggleAnchor(): void
