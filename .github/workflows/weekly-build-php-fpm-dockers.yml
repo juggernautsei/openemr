@@ -2,8 +2,7 @@ name: Weekly Build php-fpm Dockers
 
 on:
   workflow_dispatch:
-  schedule:
-  - cron: '0 2 * * 0'   # (weekly) run at 2 AM UTC on Sundays
+  # schedule removed — jobs only publish on openemr/openemr
 
 permissions:
   contents: read

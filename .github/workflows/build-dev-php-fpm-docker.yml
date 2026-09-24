@@ -1,9 +1,10 @@
-name: Nightly Build development 8.6 php-fpm Docker
+name: Build development 8.6 php-fpm Docker (manual)
 
+# Cost control: image publish only from openemr/openemr master.
+# This fork's scheduled Nightly builds were dry-run failures (Actions cost).
+# Manual workflow_dispatch remains available if needed.
 on:
   workflow_dispatch:
-  schedule:
-  - cron: '0 1 * * *'   # (daily) run at 1 AM UTC
 
 permissions:
   contents: read
@@ -12,7 +13,6 @@ jobs:
   build:
     runs-on: ubuntu-24.04
     env:
-      # Only publish the image from master of the canonical repo; other branches / forks build dry-run.
       PUSH_IMAGE: ${{ github.repository == 'openemr/openemr' && github.ref == 'refs/heads/master' }}
     steps:
     - name: Checkout repository
