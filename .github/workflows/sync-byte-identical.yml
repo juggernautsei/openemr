@@ -57,7 +57,7 @@ on:
     branches:
     - master
   schedule:
-  - cron: '0 9 * * *'
+  - cron: '0 9 * * 0'
   workflow_dispatch:
 
 permissions:

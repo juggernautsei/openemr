@@ -141,7 +141,7 @@ on:
     - 'build.xml'
     - '.gitattributes'
   schedule:
-  - cron: '0 10 * * *'
+  - cron: '0 10 * * 0'
 
 permissions:
   contents: read

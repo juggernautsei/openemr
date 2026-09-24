@@ -153,7 +153,7 @@ updates:
   directories:
   - ci/compose-shared-selenium/
   schedule:
-    interval: daily
+    interval: weekly
   open-pull-requests-limit: 5
   allow:
   - dependency-name: selenium/standalone-chromium
@@ -202,7 +202,7 @@ updates:
   # a variable substitution — dependabot skips those automatically.
   - .github/docker/
   schedule:
-    interval: daily
+    interval: weekly
   open-pull-requests-limit: 10
   ignore:
     # Block major/minor bumps for version-pinned images only — each CI
@@ -252,7 +252,7 @@ updates:
   - docker/development-easy-redis/
   - docker/production/
   schedule:
-    interval: daily
+    interval: weekly
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: mariadb
@@ -290,7 +290,7 @@ updates:
   directories:
   - docker/development-insane/
   schedule:
-    interval: daily
+    interval: weekly
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: mariadb

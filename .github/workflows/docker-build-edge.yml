@@ -15,7 +15,7 @@ name: Flex Edge Dockers Nightly Build
 on:
   workflow_dispatch:
   schedule:
-  - cron: '0 2 * * *'   # run at 2 AM UTC
+  - cron: '0 2 * * 0'   # weekly Sunday at 2 AM UTC
 
 jobs:
   build:

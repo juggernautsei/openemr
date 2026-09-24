@@ -36,7 +36,7 @@ on:
     - rel-*
   schedule:
     # 8:00 UTC = 3:00 AM EST / 4:00 AM EDT
-  - cron: 0 8 * * *
+  - cron: 0 8 * * 0
   workflow_dispatch:
 
 permissions:
